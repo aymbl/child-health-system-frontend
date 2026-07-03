@@ -1,338 +1,365 @@
 <template>
-	<div class="login-page">
-		<div class="login-mask"></div>
+  <div class="login-page">
+    <div class="login-mask"></div>
 
-		<div class="login-wrapper">
-			<div class="login-left">
-				<div class="login-left-mask">
-					<div class="login-left-content">
-						<h1>儿童健康管理系统</h1>
-						<p>Child Health Management System</p>
-					</div>
-				</div>
-			</div>
+    <div class="login-wrapper">
+      <div class="login-left">
+        <div class="login-left-mask">
+          <div class="login-left-content">
+            <h1>儿童健康管理系统</h1>
+            <p>Child Health Management System</p>
+          </div>
+        </div>
+      </div>
 
-			<div class="login-right">
-				<el-card class="login-card" shadow="hover">
-					<div class="login-header">
-						<h2>用户登录</h2>
-						<p>请选择登录身份并输入账号信息</p>
-					</div>
+      <div class="login-right">
+        <el-card class="login-card" shadow="hover">
+          <div class="login-header">
+            <h2>用户登录</h2>
+            <p>请选择登录身份并输入账号信息</p>
+          </div>
 
-					<el-form ref="formRef" :model="form" :rules="rules" label-width="78px" hide-required-asterisk
-						class="login-form">
-						<el-form-item label="用户名" prop="username">
-							<el-input v-model="form.username" placeholder="请输入用户名" size="large" clearable />
-						</el-form-item>
+          <el-form ref="formRef" :model="form" :rules="rules" label-width="78px" hide-required-asterisk class="login-form">
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="form.username" placeholder="请输入用户名" size="large" clearable />
+            </el-form-item>
 
-						<el-form-item label="密　码" prop="password">
-							<el-input v-model="form.password" type="password" show-password placeholder="请输入密码"
-								size="large" @keyup.enter="handleLogin" />
-						</el-form-item>
+            <el-form-item label="密码" prop="password">
+              <el-input
+                v-model="form.password"
+                type="password"
+                show-password
+                placeholder="请输入密码"
+                size="large"
+                @keyup.enter="handleLogin"
+              />
+            </el-form-item>
 
-						<el-form-item prop="loginType" class="login-type-item">
-							<el-radio-group v-model="form.loginType" class="login-type-group">
-								<el-radio label="admin">管理端</el-radio>
-								<el-radio label="doctor">医生端</el-radio>
-								<el-radio label="parent">家长端</el-radio>
-							</el-radio-group>
-						</el-form-item>
+            <el-form-item prop="loginType" class="login-type-item">
+              <el-radio-group v-model="form.loginType" class="login-type-group">
+                <el-radio value="admin">管理端</el-radio>
+                <el-radio value="doctor">医生端</el-radio>
+                <el-radio value="parent">家长端</el-radio>
+              </el-radio-group>
+            </el-form-item>
 
-						<el-form-item class="login-btn-item">
-							<el-button type="primary" size="large" class="login-btn" @click="handleLogin">
-								登录
-							</el-button>
-						</el-form-item>
-					</el-form>
-				</el-card>
-			</div>
-		</div>
-	</div>
+            <el-form-item class="login-btn-item">
+              <el-button type="primary" size="large" class="login-btn" @click="handleLogin">
+                登录
+              </el-button>
+
+              <div v-if="form.loginType === 'parent'" class="login-links-row">
+                <el-button type="primary" link class="forgot-link" @click="goForgotPassword">忘记密码？重置密码</el-button>
+                <el-button type="primary" link class="register-link" @click="goRegister">
+                  还没有账号？立即注册
+                </el-button>
+              </div>
+            </el-form-item>
+          </el-form>
+        </el-card>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-	import {
-		reactive,
-		ref
-	} from 'vue'
-	import {
-		useRouter
-	} from 'vue-router'
-	import {
-		ElMessage
-	} from 'element-plus'
-	import {
-		login
-	} from '@/api/auth'
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { login } from '@/api/auth'
 
-	const router = useRouter()
-	const formRef = ref()
+const router = useRouter()
+const formRef = ref()
 
-	const form = reactive({
-		loginType: 'admin',
-		username: '',
-		password: ''
-	})
+const form = reactive({
+  loginType: 'admin',
+  username: '',
+  password: ''
+})
 
-	const rules = {
-		loginType: [{
-			required: true,
-			message: '请选择登录身份',
-			trigger: 'change'
-		}],
-		username: [{
-			required: true,
-			message: '请输入用户名',
-			trigger: 'blur'
-		}],
-		password: [{
-			required: true,
-			message: '请输入密码',
-			trigger: 'blur'
-		}]
-	}
+const rules = {
+  loginType: [{ required: true, message: '请选择登录身份', trigger: 'change' }],
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+}
 
-	const roleTextMap = {
-		admin: '管理端',
-		doctor: '医生端',
-		parent: '家长端'
-	}
+const roleTextMap = {
+  admin: '管理端',
+  doctor: '医生端',
+  parent: '家长端'
+}
 
-	const handleLogin = () => {
-		formRef.value.validate(async (valid) => {
-			if (!valid) return
+const handleLogin = () => {
+  formRef.value.validate(async valid => {
+    if (!valid) return
 
-			try {
-				const res = await login({
-					username: form.username,
-					password: form.password
-				})
+    try {
+      const res = await login({
+        username: form.username,
+        password: form.password
+      })
 
-				const user = res.data
+      const token = res.data?.token
+      const user = res.data?.userInfo
 
-				if (user.role !== form.loginType) {
-					ElMessage.error(`该账号不属于${roleTextMap[form.loginType]}`)
-					return
-				}
+      if (!token || !user) {
+        ElMessage.error('登录返回数据不完整')
+        return
+      }
 
-				localStorage.setItem('userInfo', JSON.stringify(user))
-				ElMessage.success('登录成功')
+      if (user.role !== form.loginType) {
+        ElMessage.error(`该账号不属于${roleTextMap[form.loginType]}`)
+        return
+      }
 
-				if (user.role === 'admin') {
-					router.push('/admin/dashboard')
-				} else if (user.role === 'doctor') {
-					router.push('/doctor/home')
-				} else if (user.role === 'parent') {
-					router.push('/parent/home')
-				} else {
-					ElMessage.error('用户角色不正确')
-				}
-			} catch (error) {
-				console.error('登录失败：', error)
-			}
-		})
-	}
+      localStorage.setItem('token', token)
+      localStorage.setItem('userInfo', JSON.stringify(user))
+      ElMessage.success('登录成功')
+
+      if (user.role === 'admin') {
+        router.push('/admin/home')
+      } else if (user.role === 'doctor') {
+        router.push('/doctor/home')
+      } else if (user.role === 'parent') {
+        router.push('/parent/home')
+      } else {
+        ElMessage.error('用户角色无效')
+      }
+    } catch (error) {
+      console.error('登录失败：', error)
+      ElMessage.error(error.response?.data?.message || '登录失败')
+    }
+  })
+}
+
+const goRegister = () => {
+  router.push('/register')
+}
+
+const goForgotPassword = () => {
+  router.push('/forgot-password')
+}
 </script>
 
 <style scoped>
-	.login-page {
-		position: relative;
-		width: 100%;
-		height: 100vh;
-		overflow: hidden;
-		background: url('/login-bg.jpg') no-repeat center center;
-		background-size: cover;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
+.login-page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-	.login-mask {
-		position: absolute;
-		inset: 0;
-		background: rgba(30, 41, 59, 0.28);
-	}
+.login-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 41, 59, 0.28);
+}
 
-	.login-wrapper {
-		position: relative;
-		z-index: 2;
-		width: 1100px;
-		max-width: 94%;
-		height: 620px;
-		display: flex;
-		border-radius: 24px;
-		overflow: hidden;
-		box-shadow: 0 16px 45px rgba(0, 0, 0, 0.18);
-		background: rgba(255, 255, 255, 0.94);
-		backdrop-filter: blur(4px);
-	}
+.login-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 1100px;
+  max-width: 94%;
+  height: 620px;
+  display: flex;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.18);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(4px);
+}
 
-	.login-left {
-		width: 50%;
-		position: relative;
-		background-image: url('/login-side.png');
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-position: 95% center;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: #fff;
-		overflow: hidden;
-	}
+.login-left {
+  width: 50%;
+  position: relative;
+  background-image: url('/login-side.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 95% center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  overflow: hidden;
+}
 
-	.login-left-mask {
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(135deg,
-				rgba(58, 123, 213, 0.28),
-				rgba(0, 210, 255, 0.12));
-		display: flex;
-		align-items: flex-start;
-		justify-content: center;
-		padding-top: 105px;
-		box-sizing: border-box;
-	}
+.login-left-mask {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(58, 123, 213, 0.28), rgba(0, 210, 255, 0.12));
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 105px;
+  box-sizing: border-box;
+}
 
-	.login-left-content {
-		width: 100%;
-		text-align: center;
-		padding: 0 30px;
-		box-sizing: border-box;
-	}
+.login-left-content {
+  width: 100%;
+  text-align: center;
+  padding: 0 30px;
+  box-sizing: border-box;
+}
 
-	.login-left-content h1 {
-		font-size: 34px;
-		margin: 0 0 16px 0;
-		font-weight: 700;
-		color: #ffffff;
-		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-	}
+.login-left-content h1 {
+  font-size: 34px;
+  margin: 0 0 16px 0;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
 
-	.login-left-content p {
-		font-size: 16px;
-		margin: 0;
-		color: #f8fbff;
-		opacity: 0.98;
-		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-	}
+.login-left-content p {
+  font-size: 16px;
+  margin: 0;
+  color: #f8fbff;
+  opacity: 0.98;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
 
-	.login-right {
-		width: 50%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 30px;
-		box-sizing: border-box;
-		background: rgba(255, 255, 255, 0.96);
-	}
+.login-right {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.96);
+}
 
-	.login-card {
-		width: 100%;
-		max-width: 460px;
-		border-radius: 16px;
-		border: none;
-		box-shadow: none;
-		background: transparent;
-	}
+.login-card {
+  width: 100%;
+  max-width: 460px;
+  border-radius: 16px;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
 
-	.login-header {
-		text-align: center;
-		margin-bottom: 34px;
-	}
+.login-header {
+  text-align: center;
+  margin-bottom: 34px;
+}
 
-	.login-header h2 {
-		margin: 0 0 12px 0;
-		font-size: 30px;
-		color: #1f2937;
-		font-weight: 700;
-	}
+.login-header h2 {
+  margin: 0 0 12px 0;
+  font-size: 30px;
+  color: #1f2937;
+  font-weight: 700;
+}
 
-	.login-header p {
-		margin: 0;
-		font-size: 14px;
-		color: #6b7280;
-	}
+.login-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
+}
 
-	.login-form {
-		margin-top: 10px;
-	}
+.login-form {
+  margin-top: 10px;
+}
 
-	.login-type-item {
-		margin-top: 4px;
-		margin-bottom: 22px;
-	}
+.login-type-item {
+  margin-top: 4px;
+  margin-bottom: 22px;
+}
 
-	.login-btn-item {
-		margin-top: 8px;
-		margin-bottom: 0;
-	}
+.login-btn-item {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
 
-	.login-btn {
-		width: 100%;
-		border-radius: 10px;
-		font-size: 16px;
-		letter-spacing: 2px;
-	}
+.login-btn {
+  width: 100%;
+  border-radius: 10px;
+  font-size: 16px;
+  letter-spacing: 2px;
+}
 
-	.login-type-group {
-		display: flex;
-		justify-content: center;
-		gap: 24px;
-		width: 100%;
-	}
+.login-links-row {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
 
-	:deep(.el-form-item) {
-		margin-bottom: 24px;
-	}
+.forgot-link,
+.register-link {
+  padding: 0;
+  height: auto;
+}
 
-	:deep(.el-form-item__label) {
-		font-size: 15px;
-		color: #374151;
-		font-weight: 500;
-		letter-spacing: 1px;
-	}
+.register-placeholder {
+  min-width: 120px;
+}
 
-	:deep(.el-input__wrapper) {
-		border-radius: 10px;
-	}
+.login-type-group {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+}
 
-	:deep(.el-radio__input.is-checked + .el-radio__label) {
-		color: #409eff;
-		font-weight: 600;
-	}
+:deep(.el-form-item) {
+  margin-bottom: 24px;
+}
 
-	@media screen and (max-width: 900px) {
-		.login-wrapper {
-			width: 94%;
-			height: auto;
-			flex-direction: column;
-		}
+:deep(.el-form-item__label) {
+  font-size: 15px;
+  color: #374151;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
 
-		.login-left,
-		.login-right {
-			width: 100%;
-		}
+:deep(.el-input__wrapper) {
+  border-radius: 10px;
+}
 
-		.login-left {
-			min-height: 260px;
-		}
+:deep(.el-radio__input.is-checked + .el-radio__label) {
+  color: #409eff;
+  font-weight: 600;
+}
 
-		.login-left-mask {
-			padding-top: 70px;
-		}
+@media screen and (max-width: 900px) {
+  .login-wrapper {
+    width: 94%;
+    height: auto;
+    flex-direction: column;
+  }
 
-		.login-left-content h1 {
-			font-size: 28px;
-		}
+  .login-left,
+  .login-right {
+    width: 100%;
+  }
 
-		.login-right {
-			padding: 24px 20px 30px;
-		}
+  .login-left {
+    min-height: 260px;
+  }
 
-		.login-type-group {
-			gap: 12px;
-			flex-wrap: wrap;
-		}
-	}
+  .login-left-mask {
+    padding-top: 70px;
+  }
+
+  .login-left-content h1 {
+    font-size: 28px;
+  }
+
+  .login-right {
+    padding: 24px 20px 30px;
+  }
+
+  .login-type-group {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .login-links-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
 </style>

@@ -1,22 +1,22 @@
 import request from './request'
 
-export function getDashboardStats() {
+export function getAdminHomeStats() {
 	return request({
-		url: '/dashboard/stats',
+		url: '/adminhome/stats',
 		method: 'get'
 	})
 }
 
 export function getRecentAppointments() {
 	return request({
-		url: '/dashboard/recent-appointments',
+		url: '/adminhome/recent-appointments',
 		method: 'get'
 	})
 }
 
 export function getLatestNotices() {
 	return request({
-		url: '/dashboard/latest-notices',
+		url: '/adminhome/latest-notices',
 		method: 'get'
 	})
 }

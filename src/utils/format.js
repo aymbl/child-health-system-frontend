@@ -9,3 +9,10 @@ export function formatDateTime(value) {
 
 	return str
 }
+
+export function formatDate(value) {
+	if (!value) return '—'
+
+	const str = formatDateTime(value)
+	return str.length >= 10 ? str.slice(0, 10) : str
+}

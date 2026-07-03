@@ -1,46 +1,77 @@
 import request from './request'
 
-// 查询用户列表（按角色）
 export function getUserList(role) {
-	return request({
-		url: '/users',
-		method: 'get',
-		params: {
-			role
-		}
-	})
+  return request({
+    url: '/users',
+    method: 'get',
+    params: { role }
+  })
 }
 
-// 根据ID查询用户详情
 export function getUserById(id) {
-	return request({
-		url: `/users/${id}`,
-		method: 'get'
-	})
+  return request({
+    url: `/users/${id}`,
+    method: 'get'
+  })
 }
 
-// 新增用户
 export function addUser(data) {
-	return request({
-		url: '/users',
-		method: 'post',
-		data
-	})
+  return request({
+    url: '/users',
+    method: 'post',
+    data
+  })
 }
 
-// 修改用户
 export function updateUser(data) {
-	return request({
-		url: '/users',
-		method: 'put',
-		data
-	})
+  return request({
+    url: '/users',
+    method: 'put',
+    data
+  })
 }
 
-// 删除用户
 export function deleteUserById(id) {
-	return request({
-		url: `/users/${id}`,
-		method: 'delete'
-	})
+  return request({
+    url: `/users/${id}`,
+    method: 'delete'
+  })
+}
+
+export function getDoctorOptions() {
+  return request({
+    url: '/users/doctors/options',
+    method: 'get'
+  })
+}
+
+export function getMyProfile() {
+  return request({
+    url: '/users/me',
+    method: 'get'
+  })
+}
+
+export function updateMyProfile(data) {
+  return request({
+    url: '/users/me/profile',
+    method: 'put',
+    data
+  })
+}
+
+export function forgotPassword(data) {
+  return request({
+    url: '/users/forgot-password',
+    method: 'post',
+    data
+  })
+}
+
+export function changePassword(data) {
+  return request({
+    url: '/users/change-password',
+    method: 'put',
+    data
+  })
 }

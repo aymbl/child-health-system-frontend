@@ -2,7 +2,7 @@
 	<div class="page-container">
 		<h2 class="page-title">通知公告管理</h2>
 
-		<el-card class="search-card">
+		<el-card class="search-card" shadow="hover">
 			<el-form :inline="true" :model="searchForm">
 				<el-form-item label="通知标题">
 					<el-input v-model="searchForm.title" placeholder="请输入通知标题" clearable />
@@ -15,17 +15,39 @@
 			</el-form>
 		</el-card>
 
-		<el-card class="table-card">
+		<el-card class="table-card" shadow="hover">
 			<div class="table-header">
 				<el-button type="primary" @click="handleAdd">新增通知</el-button>
 			</div>
 
-			<el-table :data="tableData" border style="width: 100%">
-				<el-table-column prop="id" label="通知ID" width="90" />
-				<el-table-column prop="title" label="通知标题" min-width="200" />
-				<el-table-column prop="content" label="通知内容" min-width="300" show-overflow-tooltip />
-				<el-table-column prop="createTime" label="发布时间" width="180" />
-				<el-table-column label="操作" width="220" fixed="right">
+			<el-table :data="tableData" border stripe style="width: 100%">
+				<el-table-column prop="id" label="通知ID" width="90" align="center" />
+				<el-table-column prop="title" label="通知标题" min-width="180" show-overflow-tooltip />
+
+				<el-table-column label="分类" width="120" align="center">
+					<template #default="scope">
+						<el-tag type="primary" effect="light">
+							{{ scope.row.category || '系统通知' }}
+						</el-tag>
+					</template>
+				</el-table-column>
+
+				<el-table-column label="置顶" width="90" align="center">
+					<template #default="scope">
+						<el-tag v-if="scope.row.isTop === 1" type="danger">置顶</el-tag>
+						<el-tag v-else type="info">普通</el-tag>
+					</template>
+				</el-table-column>
+
+				<el-table-column prop="content" label="通知内容" min-width="260" show-overflow-tooltip />
+
+				<el-table-column label="发布时间" width="180" align="center">
+					<template #default="scope">
+						{{ formatDateTime(scope.row.createTime) }}
+					</template>
+				</el-table-column>
+
+				<el-table-column label="操作" width="220" fixed="right" align="center">
 					<template #default="scope">
 						<el-button size="small" type="primary" @click="handleEdit(scope.row)">
 							编辑
@@ -62,6 +84,9 @@
 		getNoticeList,
 		deleteNoticeById
 	} from '@/api/notice'
+	import {
+		formatDateTime
+	} from '@/utils/format'
 
 	const router = useRouter()
 
@@ -80,20 +105,21 @@
 				title: searchForm.title
 			})
 
-			console.log('通知列表接口返回数据：', res)
-
 			const list = res.data || []
 
 			tableData.value = list.map(item => ({
 				id: item.id,
-				title: item.title,
-				content: item.content,
+				title: item.title || '',
+				content: item.content || '',
+				category: item.category || '系统通知',
+				isTop: item.isTop ?? item.is_top ?? 0,
 				createTime: item.createTime || item.createdAt || item.created_at || ''
 			}))
 
 			total.value = tableData.value.length
 		} catch (error) {
 			console.error('获取通知列表失败：', error)
+			ElMessage.error('获取通知列表失败')
 		}
 	}
 
@@ -141,14 +167,19 @@
 
 	.page-title {
 		margin: 0 0 20px 0;
+		font-size: 28px;
+		font-weight: 700;
+		color: #303133;
 	}
 
 	.search-card {
 		margin-bottom: 20px;
+		border-radius: 12px;
 	}
 
 	.table-card {
 		margin-bottom: 20px;
+		border-radius: 12px;
 	}
 
 	.table-header {
