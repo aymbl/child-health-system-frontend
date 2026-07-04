@@ -24,6 +24,10 @@ request.interceptors.response.use(
 
     // 当前项目后端统一返回 Result 结构，成功码兼容 200 / 1 两种写法
     if (res.code === 200 || res.code === 1) {
+      if (res.data && Array.isArray(res.data.records)) {
+        res.page = res.data
+        res.data = res.data.records
+      }
       return res
     }
 
