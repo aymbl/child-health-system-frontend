@@ -1,38 +1,60 @@
-# child_health_system_front
 
-This template should help get you started developing with Vue 3 in Vite.
+---
 
-## Recommended IDE Setup
+# 前端仓库（child-health-system-frontend）
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+```markdown
+# 儿童健康管理系统（前端）
 
-## Recommended Browser Setup
+## 📖 项目简介
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+儿童健康管理系统前端基于 **Vue3** 开发，采用前后端分离架构，实现儿童健康档案、预约管理、疫苗提醒、健康问卷、用户反馈等功能页面，为用户提供简洁友好的健康管理平台。
 
-## Customize configuration
+---
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## 🚀 技术栈
 
-## Project Setup
+- Vue3
+- Vue Router
+- Axios
+- Element Plus
+- ECharts
+- JavaScript
+- Vite
 
-```sh
+---
+
+## ✨ 功能模块
+
+- 用户登录
+- 首页数据统计
+- 儿童档案管理
+- 体检预约
+- 疫苗提醒
+- 生长发育记录
+- 健康问卷
+- 用户反馈
+- 公告通知
+
+---
+
+## 📁 项目结构
+
+```text
+src/
+├── api
+├── components
+├── router
+├── views
+├── assets
+└── utils
+
+运行环境
+Node.js 18+
+npm
+Vite
+
+启动项目：
 npm install
-```
 
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
